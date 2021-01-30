@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	
+
+    <!--Leaflet -->
+
+	<link rel="stylesheet" href="leaflet/leaflet.css" />
+	<script src="leaflet/leaflet.js"></script>
+
+
+
+    <!--Estilos propios -->
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+
+    <!--Fontello -->
+
+    <link rel="stylesheet" type="text/css" href="css/fontello.css">
+
+
+    <script type="text/javascript" src="js/app.js"></script>
+
+
+
+</head>
+<body>
+
+	
+    <div class="div1">
+
+    	<div class="subdiv1">
+    		<h2>IP Address Tracker</h2>
+    		<input type="text" name="input" id="search-ip" placeholder="Search for any IP address or domain"><button type="submit" class="btn" id="btn_geolocalizar">
+    <i class="icon-right-big"></i>
+    	</div>
+
+    	<div class="subdiv2">
+    		<article>
+    			<span>IP ADDRESS</span>
+    			<h2 id="ip-address">Cargandoo..</h2>
+    			
+    		</article>
+
+    		<article>
+
+    		    <span>LOCATION</span>
+    			<h2 id="location">Cargandoo..</h2>
+    		</article>
+
+
+    		<article>
+    			<span>TIMEZONE</span>
+    			<h2 id="time-zone">Cargandoo..</h2>
+    			
+    		</article>
+
+
+    		<article>
+    			<span>ISP</span>
+    			<h2 id="isp">Cargandoo..</h2>
+    			
+    		</article>
+
+
+
+    	</div>
+
+
+    </div>
+
+
+    <div id="map">
+    	
+
+
+    </div>
+
+
+</body>
+</html>
+
+
+
+<!--Inicializacion de mapas -->
+
+<script>
+
+
+var ip_element = document.getElementById("ip-address");
+var location_element = document.getElementById("location");
+var time_zone_element  = document.getElementById("time-zone");
+var isp_element  = document.getElementById("isp");
+
+
+
+	//Creamos contenedor de mapa con funcionalidades con manipulacion con la superclase L que nos permitira
+var map = L.map('map', {
+    zoom: 13
+});
+
+
+
+//Metodos de configuracion
+
+
+//Aniadiendo una imagen de mapa como capa y definiendo atributos de funcionalidad,por ejemplo el zoom maximo que se puede hacer
+
+L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {    
+attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+maxZoom: 19
+}).addTo(map);
+
+
+L.control.scale().addTo(map);  //Anadimos un control de escala para visualizar altura y a que escala se esta viendo 
+
+
+
+//Function que cambia la posicion y el marcador a una nuevas cordenadas
+function setMap(corX,corY){
+
+	map.setView([corX , corY]);
+	L.marker([corX , corY]).addTo(map);
+
+}
+
+
+
+fetch('https://api.ipify.org?format=json')
+  .then(function(response) { return response.json() })
+  .then((data) => {
+
+  	 fetch('https://geo.ipify.org/api/v1?apiKey=at_tckw35GQSKAbqbhhhQAqNkfo2BRTs&ipAddress='+data.ip).then(function(response){return response.json()}).then(data => {   
+
+  	 	    ip_element.innerHTML = data.ip;
+  	 	    location_element.innerHTML = data.location.region;
+  	 	    time_zone_element.innerHTML = data.location.timezone;
+  	 	    isp_element.innerHTML = data.isp;
+
+  	 	    setMap(data.location.lat,data.location.lng);
+
+
+  	 }).catch(error => {
+  	 	console.log(error);
+  	 })
+
+
+
+
+  
+  }).catch(error => console.error(error));
+
+
+
+</script>
+
